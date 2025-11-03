@@ -21,21 +21,32 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const [showSubscribePopup, setShowSubscribePopup] = useState(false);
   const [hasReadVerse, setHasReadVerse] = useState(false);
+  const [hasShownPopup, setHasShownPopup] = useState(false);
+
+  // Check if popup was already shown in this session
+  useEffect(() => {
+    const popupShown = sessionStorage.getItem("sukoon-popup-shown");
+    if (popupShown === "true") {
+      setHasShownPopup(true);
+    }
+  }, []);
 
   // Mouse exit detection for popup
   useEffect(() => {
-    if (!hasReadVerse || pageState !== "displaying") return;
+    if (!hasReadVerse || pageState !== "displaying" || hasShownPopup) return;
 
     const handleMouseLeave = (e: MouseEvent) => {
       // Check if mouse is leaving from the top of the viewport
       if (e.clientY <= 0) {
         setShowSubscribePopup(true);
+        setHasShownPopup(true);
+        sessionStorage.setItem("sukoon-popup-shown", "true");
       }
     };
 
     document.addEventListener("mouseleave", handleMouseLeave);
     return () => document.removeEventListener("mouseleave", handleMouseLeave);
-  }, [hasReadVerse, pageState]);
+  }, [hasReadVerse, pageState, hasShownPopup]);
 
   const handleMoodSelect = async (mood: MoodType) => {
     setSelectedMood(mood);

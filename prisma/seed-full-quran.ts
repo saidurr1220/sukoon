@@ -18,20 +18,16 @@ const QURAN_API_BASE = 'https://api.quran.com/api/v4';
 const BENGALI_TRANSLATION_ID = 161; // Taisirul Quran - Zakaria Abul Hussain
 const AUDIO_RECITER_ID = 7; // Abdul Basit
 
-interface QuranVerse {
+interface VerseData {
     verse_number: number;
     verse_key: string;
     text_uthmani: string;
+    translations: Translation[];
 }
 
 interface Translation {
     resource_id: number;
     text: string;
-}
-
-interface VerseData {
-    verse: QuranVerse;
-    translations: Translation[];
 }
 
 async function fetchWithRetry(url: string, retries = 3): Promise<any> {
@@ -51,12 +47,33 @@ async function fetchWithRetry(url: string, retries = 3): Promise<any> {
 }
 
 async function fetchChapter(chapterNumber: number): Promise<VerseData[]> {
-    const url = `${QURAN_API_BASE}/verses/by_chapter/${chapterNumber}?language=bn&words=false&translations=${BENGALI_TRANSLATION_ID}&per_page=300`;
+    // Use quran endpoint instead of verses to get Arabic text
+    const url = `${QURAN_API_BASE}/quran/verses/uthmani?chapter_number=${chapterNumber}`;
 
     console.log(`Fetching Chapter ${chapterNumber}...`);
-    const data = await fetchWithRetry(url);
+    const arabicData = await fetchWithRetry(url);
 
-    return data.verses || [];
+    // Fetch translations separately
+    const translationUrl = `${QURAN_API_BASE}/verses/by_chapter/${chapterNumber}?language=bn&words=false&translations=${BENGALI_TRANSLATION_ID}&per_page=300`;
+    const translationData = await fetchWithRetry(translationUrl);
+
+    // Merge Arabic text with translations
+    const verses: VerseData[] = [];
+    if (arabicData.verses && translationData.verses) {
+        for (let i = 0; i < arabicData.verses.length; i++) {
+            const arabicVerse = arabicData.verses[i];
+            const translationVerse = translationData.verses[i];
+
+            verses.push({
+                verse_number: arabicVerse.verse_number,
+                verse_key: arabicVerse.verse_key,
+                text_uthmani: arabicVerse.text_uthmani,
+                translations: translationVerse?.translations || []
+            });
+        }
+    }
+
+    return verses;
 }
 
 async function seedFullQuran() {
@@ -99,11 +116,17 @@ async function seedFullQuran() {
             console.log(`  Seeding Chapter ${chapterNum} (${verses.length} verses)...`);
 
             for (const verseData of verses) {
-                const [surah, ayah] = verseData.verse.verse_key.split(':').map(Number);
+                // Verify verse data structure
+                if (!verseData || !verseData.verse_key) {
+                    console.warn(`  ⚠ Invalid verse data in Chapter ${chapterNum}`);
+                    continue;
+                }
+
+                const [surah, ayah] = verseData.verse_key.split(':').map(Number);
                 const verseId = `${surah}:${ayah}`;
 
                 // Get Bengali translation
-                const bengaliTranslation = verseData.translations.find(
+                const bengaliTranslation = verseData.translations?.find(
                     t => t.resource_id === BENGALI_TRANSLATION_ID
                 );
 
@@ -123,7 +146,7 @@ async function seedFullQuran() {
                         id: verseId,
                         surah,
                         ayah,
-                        arabicText: verseData.verse.text_uthmani,
+                        arabicText: verseData.text_uthmani,
                         audioUrl,
                         checksum: 'quran-com-api',
                         translations: {
