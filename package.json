@@ -1,0 +1,46 @@
+{
+    "name": "sukoon-quran-app",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint",
+        "test:llm": "tsx src/lib/__tests__/prompts.test.ts && tsx src/lib/__tests__/llm-client.test.ts",
+        "test:components": "tsx src/components/__tests__/MoodChips.test.tsx && tsx src/components/__tests__/VerseCard.test.tsx && tsx src/components/__tests__/PopupSubscribe.test.tsx && tsx src/components/__tests__/HeroJar.test.tsx",
+        "test:email": "tsx src/lib/__tests__/email-system.test.ts",
+        "test:integration": "tsx src/app/__tests__/integration.test.ts",
+        "test:pwa": "tsx src/app/__tests__/pwa.test.ts",
+        "test": "npm run test:llm && npm run test:components && npm run test:email && npm run test:integration && npm run test:pwa",
+        "db:generate": "prisma generate",
+        "db:push": "prisma db push",
+        "db:seed": "tsx prisma/seed.ts",
+        "db:validate": "tsx prisma/validate.ts"
+    },
+    "dependencies": {
+        "@prisma/client": "^5.20.0",
+        "autoprefixer": "^10.4.21",
+        "clsx": "^2.1.1",
+        "framer-motion": "^11.11.7",
+        "next": "^14.2.33",
+        "next-pwa": "^5.6.0",
+        "react": "^18",
+        "react-dom": "^18",
+        "resend": "^4.0.0",
+        "tailwind-merge": "^3.3.1",
+        "zod": "^3.23.8"
+    },
+    "devDependencies": {
+        "@types/node": "^20",
+        "@types/react": "^18",
+        "@types/react-dom": "^18",
+        "eslint": "^8",
+        "eslint-config-next": "14.2.15",
+        "postcss": "^8",
+        "prisma": "^5.20.0",
+        "tailwindcss": "^3.4.1",
+        "tsx": "^4.19.1",
+        "typescript": "^5"
+    }
+}

@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Verse {
+  id          String        @id
+  surah       Int
+  ayah        Int
+  arabicText  String
+  audioUrl    String?
+  page        Int?
+  hizb        Int?
+  juz         Int?
+  checksum    String
+  translations Translation[]
+  moodVerses  MoodVerse[]
+  sendLogs    SendLog[]
+
+  @@unique([surah, ayah])
+  @@map("verses")
+}
+
+model Translation {
+  id           String     @id @default(cuid())
+  verseId      String
+  language     String
+  translatorId String
+  text         String
+  verse        Verse      @relation(fields: [verseId], references: [id], onDelete: Cascade)
+  translator   Translator @relation(fields: [translatorId], references: [id], onDelete: Cascade)
+
+  @@unique([verseId, language, translatorId])
+  @@map("translations")
+}
+
+model Translator {
+  id           String        @id @default(cuid())
+  name         String
+  license      String?
+  sourceUrl    String?
+  translations Translation[]
+
+  @@map("translators")
+}
+
+model Mood {
+  id         String      @id @default(cuid())
+  slug       String      @unique
+  name       String
+  colorHex   String
+  moodVerses MoodVerse[]
+
+  @@map("moods")
+}
+
+model MoodVerse {
+  id         String   @id @default(cuid())
+  moodId     String
+  verseId    String
+  weight     Float
+  reviewedAt DateTime @default(now())
+  mood       Mood     @relation(fields: [moodId], references: [id], onDelete: Cascade)
+  verse      Verse    @relation(fields: [verseId], references: [id], onDelete: Cascade)
+
+  @@unique([moodId, verseId])
+  @@map("mood_verses")
+}
+
+model Subscriber {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  confirmedAt DateTime?
+  locale      String    @default("en")
+  lastSentAt  DateTime?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  sendLogs    SendLog[]
+
+  @@map("subscribers")
+}
+
+model SendLog {
+  id           String     @id @default(cuid())
+  subscriberId String
+  verseId      String
+  sentAt       DateTime   @default(now())
+  subscriber   Subscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  verse        Verse      @relation(fields: [verseId], references: [id], onDelete: Cascade)
+
+  @@map("send_logs")
+}
+
+model ConfirmationToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@map("confirmation_tokens")
+}

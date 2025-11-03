@@ -1,0 +1,20 @@
+<svg width="240" height="320" viewBox="0 0 240 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Jar body with a classic mason jar shape -->
+  <path d="M60 80 L60 280 Q60 300 80 300 L160 300 Q180 300 180 280 L180 80 Z" 
+        fill="#E8F4F8" 
+        stroke="#7BA5B8" 
+        stroke-width="2"/>
+  
+  <!-- Jar neck -->
+  <rect x="70" y="60" width="100" height="20" 
+        fill="#E8F4F8" 
+        stroke="#7BA5B8" 
+        stroke-width="2"/>
+  
+  <!-- Glass reflection effect -->
+  <path d="M70 100 Q75 150 70 200" 
+        stroke="#FFFFFF" 
+        stroke-width="3" 
+        opacity="0.4" 
+        stroke-linecap="round"/>
+</svg>

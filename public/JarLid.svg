@@ -1,0 +1,25 @@
+<svg width="240" height="80" viewBox="0 0 240 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Lid top -->
+  <ellipse cx="120" cy="30" rx="65" ry="12" 
+           fill="#D4A574" 
+           stroke="#A67C52" 
+           stroke-width="2"/>
+  
+  <!-- Lid side -->
+  <path d="M55 30 L55 45 Q55 50 60 50 L180 50 Q185 50 185 45 L185 30" 
+        fill="#C9985E" 
+        stroke="#A67C52" 
+        stroke-width="2"/>
+  
+  <!-- Lid knob -->
+  <ellipse cx="120" cy="20" rx="15" ry="8" 
+           fill="#D4A574" 
+           stroke="#A67C52" 
+           stroke-width="1.5"/>
+  
+  <!-- Lid knob side -->
+  <path d="M105 20 L105 28 Q105 30 107 30 L133 30 Q135 30 135 28 L135 20" 
+        fill="#C9985E" 
+        stroke="#A67C52" 
+        stroke-width="1.5"/>
+</svg>

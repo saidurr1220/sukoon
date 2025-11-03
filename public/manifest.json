@@ -1,0 +1,29 @@
+{
+    "name": "Sukoon - Find Peace Through Qur'an",
+    "short_name": "Sukoon",
+    "description": "Discover relevant Qur'an verses based on your current mood",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#F7F3E9",
+    "theme_color": "#2D5A87",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable any"
+        }
+    ],
+    "categories": [
+        "lifestyle",
+        "education"
+    ],
+    "lang": "en"
+}
