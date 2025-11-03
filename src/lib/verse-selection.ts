@@ -69,12 +69,12 @@ export async function getMoodCandidates(
 /**
  * Get full verse data from database by verse ID
  * @param verseId - The verse ID (e.g., "2:255")
- * @param language - The translation language (default: "en")
+ * @param language - The translation language (default: "bn" for Bengali)
  * @returns Complete verse with translation
  */
 export async function getVerseById(
     verseId: string,
-    language: string = "en"
+    language: string = "bn"
 ): Promise<VerseWithTranslation | null> {
     try {
         const verse = await prisma.verse.findUnique({

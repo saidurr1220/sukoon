@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyUnsubscribeToken } from "@/lib/email-templates";
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Unsubscribe endpoint
  * Handles one-click unsubscribe from daily emails

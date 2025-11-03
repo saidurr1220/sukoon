@@ -12,28 +12,23 @@ export default function Footer() {
         {/* Attribution */}
         <div className="mb-4">
           <h3 className="text-xs font-semibold text-sukoon-text mb-2 uppercase tracking-wide">
-            Content Attribution
+            বিষয়বস্তুর উৎস
           </h3>
           <div className="space-y-1 text-xs text-sukoon-muted">
-            <p>
-              Qur'an text and translations sourced from verified Islamic
-              databases
-            </p>
-            <p>Audio recitations by qualified reciters</p>
-            <p>All content is used in accordance with respective licenses</p>
+            <p>কুরআনের পাঠ্য এবং অনুবাদ যাচাইকৃত ইসলামিক ডাটাবেস থেকে নেওয়া</p>
+            <p>সমস্ত বিষয়বস্তু সংশ্লিষ্ট লাইসেন্স অনুযায়ী ব্যবহার করা হয়</p>
           </div>
         </div>
 
         {/* Licensing Information */}
         <div className="mb-4">
           <h3 className="text-xs font-semibold text-sukoon-text mb-2 uppercase tracking-wide">
-            Licensing
+            লাইসেন্সিং
           </h3>
           <div className="space-y-1 text-xs text-sukoon-muted">
-            <p>Translations are provided under their respective licenses</p>
+            <p>অনুবাদগুলি তাদের নিজ নিজ লাইসেন্সের অধীনে প্রদান করা হয়</p>
             <p>
-              Please refer to individual translator attributions for specific
-              terms
+              নির্দিষ্ট শর্তাবলীর জন্য দয়া করে পৃথক অনুবাদক অ্যাট্রিবিউশন দেখুন
             </p>
           </div>
         </div>
@@ -41,18 +36,17 @@ export default function Footer() {
         {/* Disclaimer */}
         <div className="mb-4">
           <p className="text-xs text-sukoon-muted leading-relaxed">
-            Sukoon is a tool for personal spiritual reflection. It is not a
-            substitute for scholarly tafsir, fiqh resources, or guidance from
-            qualified Islamic scholars. For religious rulings or detailed
-            interpretations, please consult authentic Islamic sources and
-            scholars.
+            সুকূন ব্যক্তিগত আধ্যাত্মিক চিন্তাভাবনার জন্য একটি সরঞ্জাম। এটি
+            তাফসীর, ফিকহ সম্পদ বা যোগ্য ইসলামিক পণ্ডিতদের নির্দেশনার বিকল্প নয়।
+            ধর্মীয় রায় বা বিস্তারিত ব্যাখ্যার জন্য, দয়া করে প্রামাণিক ইসলামিক
+            উৎস এবং পণ্ডিতদের সাথে পরামর্শ করুন।
           </p>
         </div>
 
         {/* Copyright */}
         <div className="text-xs text-sukoon-muted">
           <p>
-            © {currentYear} Sukoon. Made with care for the Muslim community.
+            © {currentYear} সুকূন। মুসলিম সম্প্রদায়ের জন্য যত্ন সহকারে তৈরি।
           </p>
         </div>
 
@@ -62,19 +56,19 @@ export default function Footer() {
             href="/privacy"
             className="text-sukoon-primary hover:text-sukoon-primary/80 focus:outline-none focus:ring-2 focus:ring-sukoon-primary focus:ring-offset-2 rounded px-2 py-1"
           >
-            Privacy
+            গোপনীয়তা
           </a>
           <a
             href="/terms"
             className="text-sukoon-primary hover:text-sukoon-primary/80 focus:outline-none focus:ring-2 focus:ring-sukoon-primary focus:ring-offset-2 rounded px-2 py-1"
           >
-            Terms
+            শর্তাবলী
           </a>
           <a
             href="/about"
             className="text-sukoon-primary hover:text-sukoon-primary/80 focus:outline-none focus:ring-2 focus:ring-sukoon-primary focus:ring-offset-2 rounded px-2 py-1"
           >
-            About
+            সম্পর্কে
           </a>
         </div>
       </div>

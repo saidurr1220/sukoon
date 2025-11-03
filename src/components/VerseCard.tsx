@@ -13,62 +13,15 @@ interface VerseCardProps {
     translatorName: string;
     audioUrl?: string;
   };
+  moodColor?: string;
   onReadComplete?: () => void;
 }
 
-export default function VerseCard({ verse, onReadComplete }: VerseCardProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    // Cleanup audio on unmount
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, []);
-
-  const handlePlayAudio = async () => {
-    if (!verse.audioUrl) return;
-
-    try {
-      if (isPlaying && audioRef.current) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-        return;
-      }
-
-      setIsLoading(true);
-      setHasError(false);
-
-      if (!audioRef.current) {
-        audioRef.current = new Audio(verse.audioUrl);
-
-        audioRef.current.addEventListener("ended", () => {
-          setIsPlaying(false);
-        });
-
-        audioRef.current.addEventListener("error", () => {
-          setHasError(true);
-          setIsLoading(false);
-          setIsPlaying(false);
-        });
-      }
-
-      await audioRef.current.play();
-      setIsPlaying(true);
-      setIsLoading(false);
-    } catch (error) {
-      setHasError(true);
-      setIsLoading(false);
-      setIsPlaying(false);
-    }
-  };
-
+export default function VerseCard({
+  verse,
+  moodColor,
+  onReadComplete,
+}: VerseCardProps) {
   // Trigger onReadComplete when user has likely read the verse
   useEffect(() => {
     if (onReadComplete) {
@@ -83,7 +36,11 @@ export default function VerseCard({ verse, onReadComplete }: VerseCardProps) {
 
   return (
     <article
-      className="w-full max-w-2xl mx-auto px-4 py-6 bg-white rounded-lg shadow-lg"
+      className="w-full max-w-2xl mx-auto px-6 py-8 rounded-2xl shadow-2xl transition-all duration-500"
+      style={{
+        backgroundColor: moodColor ? `${moodColor}15` : "#ffffff",
+        borderLeft: moodColor ? `4px solid ${moodColor}` : "none",
+      }}
       aria-labelledby="verse-reference"
       role="article"
     >
@@ -133,112 +90,12 @@ export default function VerseCard({ verse, onReadComplete }: VerseCardProps) {
       </div>
 
       {/* Content Notice */}
-      <div className="text-center mb-6 px-2">
+      <div className="text-center px-2">
         <p className="text-xs text-sukoon-muted/80 leading-relaxed">
-          This verse is provided for reflection. For detailed interpretation,
-          please consult authentic tafsir resources.
+          এই আয়াতটি চিন্তাভাবনার জন্য প্রদান করা হয়েছে। বিস্তারিত ব্যাখ্যার
+          জন্য, দয়া করে প্রামাণিক তাফসীর সম্পদের সাথে পরামর্শ করুন।
         </p>
       </div>
-
-      {/* Audio Controls */}
-      {verse.audioUrl && (
-        <div className="flex justify-center">
-          <button
-            onClick={handlePlayAudio}
-            disabled={isLoading}
-            className={cn(
-              "min-h-[44px] px-6 py-3 rounded-full font-medium text-sm",
-              "transition-all duration-150 ease-out",
-              "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sukoon-primary",
-              "flex items-center gap-2",
-              hasError
-                ? "bg-red-100 text-red-900 cursor-not-allowed"
-                : isLoading
-                  ? "bg-sukoon-secondary text-sukoon-muted cursor-wait"
-                  : "bg-sukoon-primary text-white hover:bg-sukoon-primary/90 active:scale-95"
-            )}
-            aria-label={
-              isPlaying ? "Pause audio recitation" : "Play audio recitation"
-            }
-            aria-pressed={isPlaying}
-          >
-            {isLoading ? (
-              <>
-                <LoadingSpinner />
-                <span>Loading...</span>
-              </>
-            ) : hasError ? (
-              <span>Audio unavailable</span>
-            ) : isPlaying ? (
-              <>
-                <PauseIcon />
-                <span>Pause</span>
-              </>
-            ) : (
-              <>
-                <PlayIcon />
-                <span>Listen</span>
-              </>
-            )}
-          </button>
-        </div>
-      )}
     </article>
-  );
-}
-
-// Icon components
-function PlayIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="currentColor"
-      aria-hidden="true"
-    >
-      <path d="M3 2.5v11l10-5.5L3 2.5z" />
-    </svg>
-  );
-}
-
-function PauseIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="currentColor"
-      aria-hidden="true"
-    >
-      <path d="M5 3h2v10H5V3zm4 0h2v10H9V3z" />
-    </svg>
-  );
-}
-
-function LoadingSpinner() {
-  return (
-    <svg
-      className="animate-spin"
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      aria-hidden="true"
-    >
-      <circle
-        className="opacity-25"
-        cx="8"
-        cy="8"
-        r="7"
-        stroke="currentColor"
-        strokeWidth="2"
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M8 1a7 7 0 0 1 7 7h-2a5 5 0 0 0-5-5V1z"
-      />
-    </svg>
   );
 }

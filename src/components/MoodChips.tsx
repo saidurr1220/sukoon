@@ -11,6 +11,7 @@ interface MoodChipsProps {
 const MOODS: Array<{
   type: MoodType;
   label: string;
+  icon: string;
   color: string;
   bgColor: string;
   hoverColor: string;
@@ -18,7 +19,8 @@ const MOODS: Array<{
 }> = [
   {
     type: "happy",
-    label: "Happy",
+    label: "খুশি",
+    icon: "😊",
     color: "text-amber-900",
     bgColor: "bg-amber-100",
     hoverColor: "hover:bg-amber-200",
@@ -26,7 +28,8 @@ const MOODS: Array<{
   },
   {
     type: "sad",
-    label: "Sad",
+    label: "দুঃখিত",
+    icon: "😢",
     color: "text-blue-900",
     bgColor: "bg-blue-100",
     hoverColor: "hover:bg-blue-200",
@@ -34,7 +37,8 @@ const MOODS: Array<{
   },
   {
     type: "angry",
-    label: "Angry",
+    label: "রাগান্বিত",
+    icon: "😠",
     color: "text-red-900",
     bgColor: "bg-red-100",
     hoverColor: "hover:bg-red-200",
@@ -42,7 +46,8 @@ const MOODS: Array<{
   },
   {
     type: "anxious",
-    label: "Anxious",
+    label: "উদ্বিগ্ন",
+    icon: "😰",
     color: "text-violet-900",
     bgColor: "bg-violet-100",
     hoverColor: "hover:bg-violet-200",
@@ -50,7 +55,8 @@ const MOODS: Array<{
   },
   {
     type: "depressed",
-    label: "Depressed",
+    label: "বিষণ্ণ",
+    icon: "😔",
     color: "text-slate-900",
     bgColor: "bg-slate-100",
     hoverColor: "hover:bg-slate-200",
@@ -58,7 +64,8 @@ const MOODS: Array<{
   },
   {
     type: "grateful",
-    label: "Grateful",
+    label: "কৃতজ্ঞ",
+    icon: "🙏",
     color: "text-green-900",
     bgColor: "bg-green-100",
     hoverColor: "hover:bg-green-200",
@@ -105,10 +112,15 @@ export default function MoodChips({
             // Active state animation
             !disabled && "active:scale-95"
           )}
-          aria-label={`Select ${mood.label} mood`}
+          aria-label={`${mood.label} নির্বাচন করুন`}
           aria-pressed={false}
         >
-          {mood.label}
+          <span className="flex items-center justify-center gap-2">
+            <span className="text-xl" aria-hidden="true">
+              {mood.icon}
+            </span>
+            <span>{mood.label}</span>
+          </span>
         </button>
       ))}
     </div>

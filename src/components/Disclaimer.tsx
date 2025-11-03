@@ -13,42 +13,35 @@ export default function Disclaimer() {
         </div>
         <div className="flex-1">
           <h3 className="text-sm font-semibold text-amber-900 mb-1">
-            Important Notice
+            গুরুত্বপূর্ণ নোটিশ
           </h3>
           <p className="text-xs text-amber-800 leading-relaxed">
-            Sukoon provides Qur'an verses for personal reflection and spiritual
-            comfort. This is not a substitute for scholarly tafsir (exegesis) or
-            fiqh (jurisprudence) resources.
+            সুকূন ব্যক্তিগত চিন্তাভাবনা এবং আধ্যাত্মিক শান্তির জন্য কুরআনের
+            আয়াত প্রদান করে। এটি তাফসীর বা ফিকহ সম্পদের বিকল্প নয়।
           </p>
 
           {isExpanded && (
             <div className="mt-3 space-y-2 text-xs text-amber-800">
               <p>
-                <strong>Content Authenticity:</strong> All Qur'an text is
-                sourced from verified databases and is never generated,
-                modified, or paraphrased by AI systems.
+                <strong>বিষয়বস্তুর সত্যতা:</strong> সমস্ত কুরআনের পাঠ্য
+                যাচাইকৃত ডাটাবেস থেকে নেওয়া এবং কখনও AI দ্বারা তৈরি, পরিবর্তিত
+                বা ব্যাখ্যা করা হয় না।
               </p>
               <p>
-                <strong>Translations:</strong> All translations are provided by
-                licensed translators and scholars. Translation credits are
-                displayed with each verse.
+                <strong>অনুবাদ:</strong> সমস্ত অনুবাদ লাইসেন্সপ্রাপ্ত অনুবাদক
+                এবং পণ্ডিতদের দ্বারা প্রদান করা হয়। প্রতিটি আয়াতের সাথে
+                অনুবাদক ক্রেডিট প্রদর্শিত হয়।
               </p>
               <p>
-                <strong>Audio Recitations:</strong> Audio recitations are
-                provided by qualified reciters. Audio credits and sources are
-                included where available.
+                <strong>আয়াত নির্বাচন:</strong> আয়াতগুলি একটি পূর্ব-অনুমোদিত
+                ডেটাসেট থেকে মুড সংযোগের উপর ভিত্তি করে নির্বাচিত হয়। নির্বাচন
+                প্রক্রিয়া শুধুমাত্র বিদ্যমান আয়াত থেকে বেছে নিতে AI ব্যবহার
+                করে।
               </p>
               <p>
-                <strong>Verse Selection:</strong> Verses are selected based on
-                mood associations from a pre-approved dataset. The selection
-                process uses AI only to choose from existing verses, never to
-                generate or modify content.
-              </p>
-              <p>
-                <strong>Scholarly Guidance:</strong> For detailed
-                interpretation, legal rulings, or religious guidance, please
-                consult qualified Islamic scholars and authentic tafsir
-                resources.
+                <strong>পণ্ডিত নির্দেশনা:</strong> বিস্তারিত ব্যাখ্যা, আইনি রায়
+                বা ধর্মীয় নির্দেশনার জন্য, দয়া করে যোগ্য ইসলামিক পণ্ডিত এবং
+                প্রামাণিক তাফসীর সম্পদের সাথে পরামর্শ করুন।
               </p>
             </div>
           )}
@@ -57,11 +50,9 @@ export default function Disclaimer() {
             onClick={() => setIsExpanded(!isExpanded)}
             className="mt-2 text-xs font-medium text-amber-900 hover:text-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1 rounded px-1 py-0.5"
             aria-expanded={isExpanded}
-            aria-label={
-              isExpanded ? "Show less information" : "Show more information"
-            }
+            aria-label={isExpanded ? "কম তথ্য দেখান" : "আরও জানুন"}
           >
-            {isExpanded ? "Show less" : "Learn more"}
+            {isExpanded ? "কম দেখান" : "আরও জানুন"}
           </button>
         </div>
       </div>

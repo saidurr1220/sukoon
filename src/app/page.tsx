@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, lazy, Suspense } from "react";
+import { useState, lazy, Suspense, useEffect } from "react";
 import { MoodType } from "@/types";
 import HeroJar from "@/components/HeroJar";
 import MoodChips from "@/components/MoodChips";
@@ -16,10 +16,26 @@ type PageState = "idle" | "loading" | "animating" | "displaying" | "error";
 
 export default function HomePage() {
   const [pageState, setPageState] = useState<PageState>("idle");
-  const [selectedMood, setSelectedMood] = useState<string | null>(null);
+  const [selectedMood, setSelectedMood] = useState<MoodType | null>(null);
   const [verse, setVerse] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [showSubscribePopup, setShowSubscribePopup] = useState(false);
+  const [hasReadVerse, setHasReadVerse] = useState(false);
+
+  // Mouse exit detection for popup
+  useEffect(() => {
+    if (!hasReadVerse || pageState !== "displaying") return;
+
+    const handleMouseLeave = (e: MouseEvent) => {
+      // Check if mouse is leaving from the top of the viewport
+      if (e.clientY <= 0) {
+        setShowSubscribePopup(true);
+      }
+    };
+
+    document.addEventListener("mouseleave", handleMouseLeave);
+    return () => document.removeEventListener("mouseleave", handleMouseLeave);
+  }, [hasReadVerse, pageState]);
 
   const handleMoodSelect = async (mood: MoodType) => {
     setSelectedMood(mood);
@@ -51,7 +67,7 @@ export default function HomePage() {
   };
 
   const handleVerseReadComplete = () => {
-    setShowSubscribePopup(true);
+    setHasReadVerse(true);
   };
 
   const handleSubscribe = async (email: string) => {
@@ -78,6 +94,7 @@ export default function HomePage() {
     setVerse(null);
     setError(null);
     setShowSubscribePopup(false);
+    setHasReadVerse(false);
   };
 
   return (
@@ -92,9 +109,9 @@ export default function HomePage() {
 
       {/* Header */}
       <header className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-sukoon-primary mb-2">Sukoon</h1>
+        <h1 className="text-3xl font-bold text-sukoon-primary mb-2">সুকূন</h1>
         <p className="text-sukoon-muted max-w-sm px-4">
-          Find peace through Qur'an verses selected for your mood
+          আপনার মনের অবস্থা অনুযায়ী কুরআনের আয়াত থেকে শান্তি খুঁজুন
         </p>
       </header>
 
@@ -113,17 +130,15 @@ export default function HomePage() {
             aria-live="assertive"
           >
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-              <p className="text-red-800 font-medium mb-2">
-                Something went wrong
-              </p>
+              <p className="text-red-800 font-medium mb-2">কিছু ভুল হয়েছে</p>
               <p className="text-red-600 text-sm">{error}</p>
             </div>
             <button
               onClick={handleReset}
               className="min-h-[44px] px-6 py-3 bg-sukoon-primary text-white rounded-full hover:bg-sukoon-primary/90 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sukoon-primary"
-              aria-label="Try selecting a mood again"
+              aria-label="আবার চেষ্টা করুন"
             >
-              Try again
+              আবার চেষ্টা করুন
             </button>
           </div>
         )}
@@ -145,7 +160,7 @@ export default function HomePage() {
                 className="text-center text-sukoon-muted mb-4 text-sm"
                 id="mood-selection-label"
               >
-                How are you feeling today?
+                আজ আপনার মন কেমন?
               </p>
               <MoodChips
                 onMoodSelect={handleMoodSelect}
@@ -162,7 +177,9 @@ export default function HomePage() {
               >
                 <div className="inline-flex items-center gap-2 text-sukoon-muted">
                   <LoadingSpinner />
-                  <span className="text-sm">Selecting a verse for you...</span>
+                  <span className="text-sm">
+                    আপনার জন্য আয়াত নির্বাচন করা হচ্ছে...
+                  </span>
                 </div>
               </div>
             )}
@@ -182,12 +199,11 @@ export default function HomePage() {
                 surah: verse.surah,
                 ayah: verse.ayah,
                 arabicText: verse.arabicText,
-                translation:
-                  verse.translations?.[0]?.text || "Translation not available",
-                translatorName:
-                  verse.translations?.[0]?.translator?.name || "Unknown",
+                translation: verse.translation || "Translation not available",
+                translatorName: verse.translatorName || "Unknown",
                 audioUrl: verse.audioUrl,
               }}
+              moodColor={getMoodColor(selectedMood)}
               onReadComplete={handleVerseReadComplete}
             />
 
@@ -195,9 +211,9 @@ export default function HomePage() {
               <button
                 onClick={handleReset}
                 className="min-h-[44px] text-sukoon-primary hover:text-sukoon-primary/80 transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sukoon-primary rounded px-4 py-2"
-                aria-label="Return to mood selection"
+                aria-label="আবার মুড নির্বাচন করুন"
               >
-                Select another mood
+                অন্য মুড নির্বাচন করুন
               </button>
             </div>
           </div>
@@ -246,4 +262,17 @@ function LoadingSpinner() {
       />
     </svg>
   );
+}
+
+// Helper function to get mood color
+function getMoodColor(mood: MoodType | null): string {
+  const moodColors: Record<MoodType, string> = {
+    happy: "#F59E0B",
+    sad: "#3B82F6",
+    angry: "#EF4444",
+    anxious: "#8B5CF6",
+    depressed: "#64748B",
+    grateful: "#10B981",
+  };
+  return mood ? moodColors[mood] : "#6366F1";
 }

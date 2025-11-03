@@ -32,19 +32,19 @@ export default function HeroJar({
     const runAnimationSequence = async () => {
       // 1. Chip selected state
       setAnimationState("chipSelected");
-      await delay(shouldReduceMotion ? 10 : 100);
+      await delay(shouldReduceMotion ? 10 : 150);
 
       // 2. Lid opening
       setAnimationState("lidOpening");
-      await delay(shouldReduceMotion ? 15 : 300);
+      await delay(shouldReduceMotion ? 15 : 400);
 
       // 3. Slip rising
       setAnimationState("slipRising");
-      await delay(shouldReduceMotion ? 15 : 250);
+      await delay(shouldReduceMotion ? 15 : 350);
 
       // 4. Card unfold
       setAnimationState("cardUnfold");
-      await delay(shouldReduceMotion ? 10 : 150);
+      await delay(shouldReduceMotion ? 10 : 200);
 
       // Animation complete
       onAnimationComplete();
@@ -63,7 +63,8 @@ export default function HeroJar({
           opacity: animationState === "cardUnfold" ? 0 : 1,
         }}
         transition={{
-          duration: shouldReduceMotion ? 0.01 : 0.15,
+          duration: shouldReduceMotion ? 0.01 : 0.3,
+          ease: "easeInOut",
         }}
       >
         <Image
@@ -109,10 +110,10 @@ export default function HeroJar({
                 : "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)",
         }}
         transition={{
-          duration: shouldReduceMotion ? 0.015 : 0.25,
-          ease: "easeOut",
+          duration: shouldReduceMotion ? 0.015 : 0.4,
+          ease: [0.34, 1.26, 0.64, 1], // Smooth spring easing
           clipPath: {
-            duration: shouldReduceMotion ? 0.01 : 0.15,
+            duration: shouldReduceMotion ? 0.01 : 0.3,
             ease: "easeInOut",
           },
         }}
@@ -148,13 +149,13 @@ export default function HeroJar({
             animationState === "lidOpening" ||
             animationState === "slipRising" ||
             animationState === "cardUnfold"
-              ? -6
+              ? -8
               : 0,
           opacity: animationState === "cardUnfold" ? 0 : 1,
         }}
         transition={{
-          duration: shouldReduceMotion ? 0.015 : 0.3,
-          ease: shouldReduceMotion ? "linear" : [0.34, 1.56, 0.64, 1], // Spring-like easing for normal, linear for reduced motion
+          duration: shouldReduceMotion ? 0.015 : 0.5,
+          ease: shouldReduceMotion ? "linear" : [0.34, 1.26, 0.64, 1], // Smooth spring easing
         }}
       >
         <Image

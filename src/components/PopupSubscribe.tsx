@@ -149,10 +149,11 @@ export default function PopupSubscribe({
               <CheckIcon />
             </div>
             <h2 className="text-xl font-semibold text-sukoon-text mb-2">
-              Check your email!
+              আপনার ইমেইল চেক করুন!
             </h2>
             <p className="text-sukoon-muted">
-              We've sent you a confirmation link. Please check your inbox.
+              আমরা আপনাকে একটি নিশ্চিতকরণ লিঙ্ক পাঠিয়েছি। দয়া করে আপনার ইনবক্স
+              চেক করুন।
             </p>
           </div>
         ) : (
@@ -162,11 +163,10 @@ export default function PopupSubscribe({
               id="subscribe-title"
               className="text-2xl font-semibold text-sukoon-text mb-2 pr-8"
             >
-              Get a daily ayah like this?
+              প্রতিদিন এরকম আয়াত পেতে চান?
             </h2>
             <p className="text-sukoon-muted mb-6">
-              Receive a carefully selected verse each day, delivered to your
-              inbox.
+              প্রতিদিন একটি সযত্নে নির্বাচিত আয়াত আপনার ইনবক্সে পান।
             </p>
 
             <form onSubmit={handleSubmit}>
@@ -219,7 +219,7 @@ export default function PopupSubscribe({
                     isLoading && "opacity-50 cursor-not-allowed"
                   )}
                 >
-                  Maybe later
+                  পরে হবে
                 </button>
                 <button
                   type="submit"
@@ -237,10 +237,10 @@ export default function PopupSubscribe({
                   {isLoading ? (
                     <>
                       <LoadingSpinner />
-                      <span>Subscribing...</span>
+                      <span>সাবস্ক্রাইব করা হচ্ছে...</span>
                     </>
                   ) : (
-                    "Subscribe"
+                    "সাবস্ক্রাইব করুন"
                   )}
                 </button>
               </div>

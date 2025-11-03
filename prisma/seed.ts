@@ -29,6 +29,17 @@ async function main() {
         },
     });
 
+    const bengaliTranslator = await prisma.translator.upsert({
+        where: { id: 'bengali-taisirul' },
+        update: {},
+        create: {
+            id: 'bengali-taisirul',
+            name: 'তাইসিরুল কুরআন (Taisirul Quran)',
+            license: 'Public Domain',
+            sourceUrl: 'https://quran.com',
+        },
+    });
+
     console.log('✓ Translators created');
 
     // Create moods
@@ -67,9 +78,9 @@ async function main() {
             checksum: 'sample',
             translations: [
                 {
-                    language: 'en',
-                    translatorId: sahihInternational.id,
-                    text: 'And when My servants ask you, [O Muhammad], concerning Me - indeed I am near. I respond to the invocation of the supplicant when he calls upon Me. So let them respond to Me [by obedience] and believe in Me that they may be [rightly] guided.',
+                    language: 'bn',
+                    translatorId: bengaliTranslator.id,
+                    text: 'আর আমার বান্দারা যখন তোমার কাছে আমার সম্পর্কে জিজ্ঞেস করে, (তাদেরকে বলে দাও) আমি তো সন্নিকটেই আছি। যারা প্রার্থনা করে আমি তাদের প্রার্থনা কবুল করি যখন তারা আমার কাছে প্রার্থনা করে। কাজেই তারা যেন আমার হুকুম মান্য করে এবং আমার প্রতি ঈমান আনে, যাতে তারা সঠিক পথে চলতে পারে।',
                 },
             ],
         },
@@ -83,9 +94,9 @@ async function main() {
             checksum: 'sample',
             translations: [
                 {
-                    language: 'en',
-                    translatorId: sahihInternational.id,
-                    text: 'Those who have believed and whose hearts are assured by the remembrance of Allah. Unquestionably, by the remembrance of Allah hearts are assured.',
+                    language: 'bn',
+                    translatorId: bengaliTranslator.id,
+                    text: 'যারা ঈমান এনেছে এবং আল্লাহর যিকির দ্বারা যাদের অন্তর প্রশান্ত হয়। জেনে রাখ, আল্লাহর যিকির দ্বারাই অন্তরসমূহ প্রশান্ত হয়।',
                 },
             ],
         },
@@ -98,9 +109,9 @@ async function main() {
             checksum: 'sample',
             translations: [
                 {
-                    language: 'en',
-                    translatorId: sahihInternational.id,
-                    text: 'For indeed, with hardship [will be] ease. Indeed, with hardship [will be] ease.',
+                    language: 'bn',
+                    translatorId: bengaliTranslator.id,
+                    text: 'নিশ্চয়ই কষ্টের সাথে স্বস্তি আছে। নিশ্চয়ই কষ্টের সাথে স্বস্তি আছে।',
                 },
             ],
         },
@@ -113,9 +124,9 @@ async function main() {
             checksum: 'sample',
             translations: [
                 {
-                    language: 'en',
-                    translatorId: sahihInternational.id,
-                    text: 'So do not weaken and do not grieve, and you will be superior if you are [true] believers.',
+                    language: 'bn',
+                    translatorId: bengaliTranslator.id,
+                    text: 'তোমরা হীনবল হয়ো না এবং দুঃখিত হয়ো না, তোমরাই বিজয়ী হবে যদি তোমরা মুমিন হও।',
                 },
             ],
         },
@@ -129,9 +140,9 @@ async function main() {
             checksum: 'sample',
             translations: [
                 {
-                    language: 'en',
-                    translatorId: sahihInternational.id,
-                    text: 'Whoever does righteousness, whether male or female, while he is a believer - We will surely cause him to live a good life, and We will surely give them their reward [in the Hereafter] according to the best of what they used to do.',
+                    language: 'bn',
+                    translatorId: bengaliTranslator.id,
+                    text: 'যে কেউ সৎকাজ করবে, পুরুষ হোক বা নারী, যদি সে মুমিন হয়, তাহলে আমি তাকে অবশ্যই উত্তম জীবন দান করব এবং তাদেরকে তাদের কর্মের উত্তম প্রতিদান দেব।',
                 },
             ],
         },
@@ -145,9 +156,9 @@ async function main() {
             checksum: 'sample',
             translations: [
                 {
-                    language: 'en',
-                    translatorId: sahihInternational.id,
-                    text: 'Say, "O My servants who have transgressed against themselves [by sinning], do not despair of the mercy of Allah. Indeed, Allah forgives all sins. Indeed, it is He who is the Forgiving, the Merciful."',
+                    language: 'bn',
+                    translatorId: bengaliTranslator.id,
+                    text: 'বলো, হে আমার বান্দারা! যারা নিজেদের উপর বাড়াবাড়ি করেছ, তোমরা আল্লাহর রহমত থেকে নিরাশ হয়ো না। নিশ্চয়ই আল্লাহ সমস্ত পাপ ক্ষমা করে দেন। নিশ্চয়ই তিনি ক্ষমাশীল, পরম দয়ালু।',
                 },
             ],
         },
@@ -160,9 +171,9 @@ async function main() {
             checksum: 'sample',
             translations: [
                 {
-                    language: 'en',
-                    translatorId: sahihInternational.id,
-                    text: 'So which of the favors of your Lord would you deny?',
+                    language: 'bn',
+                    translatorId: bengaliTranslator.id,
+                    text: 'অতএব তোমাদের প্রতিপালকের কোন অনুগ্রহকে তোমরা অস্বীকার করবে?',
                 },
             ],
         },
@@ -176,9 +187,9 @@ async function main() {
             checksum: 'sample',
             translations: [
                 {
-                    language: 'en',
-                    translatorId: sahihInternational.id,
-                    text: 'And will provide for him from where he does not expect. And whoever relies upon Allah - then He is sufficient for him. Indeed, Allah will accomplish His purpose. Allah has already set for everything a [decreed] extent.',
+                    language: 'bn',
+                    translatorId: bengaliTranslator.id,
+                    text: 'এবং তাকে এমন উৎস থেকে রিযিক দেবেন যা সে কল্পনাও করতে পারে না। যে আল্লাহর উপর ভরসা করে, তার জন্য তিনিই যথেষ্ট। নিশ্চয়ই আল্লাহ তাঁর কাজ সম্পন্ন করবেন। আল্লাহ প্রতিটি বিষয়ের জন্য একটি পরিমাণ নির্ধারণ করে রেখেছেন।',
                 },
             ],
         },
