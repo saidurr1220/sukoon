@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "dev": "next dev",
-        "build": "next build",
+        "build": "prisma generate && next build",
         "start": "next start",
         "lint": "next lint",
         "test:llm": "tsx src/lib/__tests__/prompts.test.ts && tsx src/lib/__tests__/llm-client.test.ts",
@@ -16,6 +16,7 @@
         "db:generate": "prisma generate",
         "db:push": "prisma db push",
         "db:seed": "tsx prisma/seed.ts",
+        "db:seed:full": "tsx prisma/seed-full-quran.ts",
         "db:validate": "tsx prisma/validate.ts"
     },
     "dependencies": {
