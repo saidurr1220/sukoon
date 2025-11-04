@@ -109,3 +109,28 @@ model ConfirmationToken {
   @@index([email])
   @@map("confirmation_tokens")
 }
+
+model UserSession {
+  id              String   @id @default(cuid())
+  sessionId       String
+  selectedMood    String
+  verseId         String
+  timezone        String   @default("Asia/Dhaka")
+  userAgent       String?
+  createdAt       DateTime @default(now())
+  
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("user_sessions")
+}
+
+model VerseMetadata {
+  id          String   @id @default(cuid())
+  verseId     String   @unique
+  themes      String[] // Array of theme tags
+  timeContext String[] // Best times: morning, evening, night, etc.
+  occasions   String[] // Jummah, Ramadan, etc.
+  updatedAt   DateTime @updatedAt
+  
+  @@map("verse_metadata")
+}

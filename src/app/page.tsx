@@ -5,9 +5,14 @@ import { MoodType } from "@/types";
 import HeroJar from "@/components/HeroJar";
 import MoodChips from "@/components/MoodChips";
 import VerseCard from "@/components/VerseCard";
+import VerseSkeleton from "@/components/VerseSkeleton";
 import Disclaimer from "@/components/Disclaimer";
 import Footer from "@/components/Footer";
 import { selectVerseByMood } from "./actions/verse-actions";
+import {
+  getAdjacentVerse,
+  checkAdjacentVerses,
+} from "./actions/navigation-actions";
 
 // Lazy load PopupSubscribe for better initial bundle size
 const PopupSubscribe = lazy(() => import("@/components/PopupSubscribe"));
@@ -22,6 +27,10 @@ export default function HomePage() {
   const [showSubscribePopup, setShowSubscribePopup] = useState(false);
   const [hasReadVerse, setHasReadVerse] = useState(false);
   const [hasShownPopup, setHasShownPopup] = useState(false);
+  const [navigationState, setNavigationState] = useState<{
+    hasPrevious: boolean;
+    hasNext: boolean;
+  }>({ hasPrevious: false, hasNext: false });
 
   // Check if popup was already shown in this session
   useEffect(() => {
@@ -54,20 +63,55 @@ export default function HomePage() {
     setError(null);
 
     try {
-      // Fetch verse while animation plays
-      const result = await selectVerseByMood(mood);
+      // Detect user's timezone
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      // Fetch verse while animation plays with contextual intelligence
+      const result = await selectVerseByMood(mood, timezone);
 
       if (!result.success || !result.verse) {
         throw new Error(result.error || "Failed to load verse");
       }
 
       setVerse(result.verse);
+
+      // Check navigation availability
+      const navCheck = await checkAdjacentVerses(
+        result.verse.surah,
+        result.verse.ayah
+      );
+      setNavigationState(navCheck);
+
       setPageState("animating");
     } catch (err) {
       console.error("Error selecting verse:", err);
       setError(err instanceof Error ? err.message : "Failed to load verse");
       setPageState("error");
       setSelectedMood(null);
+    }
+  };
+
+  const handleVerseNavigation = async (direction: "prev" | "next") => {
+    if (!verse) return;
+
+    try {
+      const result = await getAdjacentVerse(verse.surah, verse.ayah, direction);
+
+      if (result.success && result.verse) {
+        setVerse(result.verse);
+
+        // Update navigation state
+        const navCheck = await checkAdjacentVerses(
+          result.verse.surah,
+          result.verse.ayah
+        );
+        setNavigationState(navCheck);
+      } else {
+        // Show error briefly
+        console.log(result.error);
+      }
+    } catch (err) {
+      console.error("Navigation error:", err);
     }
   };
 
@@ -180,17 +224,20 @@ export default function HomePage() {
             </div>
 
             {pageState === "loading" && (
-              <div
-                className="text-center mt-6"
-                role="status"
-                aria-live="polite"
-                aria-atomic="true"
-              >
-                <div className="inline-flex items-center gap-2 text-sukoon-muted">
-                  <LoadingSpinner />
-                  <span className="text-sm">
-                    আপনার জন্য আয়াত নির্বাচন করা হচ্ছে...
-                  </span>
+              <div className="mt-8">
+                <VerseSkeleton />
+                <div
+                  className="text-center mt-4"
+                  role="status"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  <div className="inline-flex items-center gap-2 text-sukoon-muted">
+                    <LoadingSpinner />
+                    <span className="text-sm">
+                      আপনার জন্য আয়াত নির্বাচন করা হচ্ছে...
+                    </span>
+                  </div>
                 </div>
               </div>
             )}
@@ -216,6 +263,9 @@ export default function HomePage() {
               }}
               moodColor={getMoodColor(selectedMood)}
               onReadComplete={handleVerseReadComplete}
+              onNavigate={handleVerseNavigation}
+              hasPrevious={navigationState.hasPrevious}
+              hasNext={navigationState.hasNext}
             />
 
             <div className="text-center mt-6">

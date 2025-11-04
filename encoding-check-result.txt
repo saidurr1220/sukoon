@@ -1,0 +1,43 @@
+=== Database Encoding Check ===
+
+Total verses checked: 3
+
+
+Verse ID: 10:1
+Surah: 10, Ayah: 1
+Arabic Text:  الٓر ۚ تِلْكَ ءَايَـٰتُ ٱلْكِتَـٰبِ ٱلْحَكِيمِ
+Arabic Text Length: 47 characters
+Contains Arabic Unicode: ✓ YES
+
+Translation (bn):
+আলিফ-লাম-র, এগুলো মহা বিজ্ঞানময় গ্রন্থের আয়াতসমূহ।
+Translation Length: 50 characters
+Contains Bengali Unicode: ✓ YES
+
+------------------------------------------------------------
+
+Verse ID: 10:10
+Surah: 10, Ayah: 10
+Arabic Text: دَعْوَىٰهُمْ فِيهَا سُبْحَـٰنَكَ ٱللَّهُمَّ وَتَحِيَّتُهُمْ فِيهَا سَلَـٰمٌ ۚ وَءَاخِرُ دَعْوَىٰهُمْ أَنِ ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ
+Arabic Text Length: 144 characters
+Contains Arabic Unicode: ✓ YES
+
+Translation (bn):
+তার ভিতরে তাদের দু’আ হবে, ‘‘পবিত্র তুমি হে আল্লাহ’’। আর সেখানে তাদের অভিবাদন হবে ‘‘শান্তি’’, আর তাদের দু‘আর সর্বশেষ কথা হবে ‘‘সমস্ত প্রশংসা জগৎসমূহের প্রতিপালক আল্লাহর জন্য’’।
+Translation Length: 175 characters
+Contains Bengali Unicode: ✓ YES
+
+------------------------------------------------------------
+
+Verse ID: 10:100
+Surah: 10, Ayah: 100
+Arabic Text: وَمَا كَانَ لِنَفْسٍ أَن تُؤْمِنَ إِلَّا بِإِذْنِ ٱللَّهِ ۚ وَيَجْعَلُ ٱلرِّجْسَ عَلَى ٱلَّذِينَ لَا يَعْقِلُونَ
+Arabic Text Length: 112 characters
+Contains Arabic Unicode: ✓ YES
+
+Translation (bn):
+আল্লাহর অনুমতি ব্যতিরেকে কেউ ঈমান আনতে পারবে না, আর যারা বিবেক বুদ্ধি খাটায় না, আল্লাহ তাদের উপর গুমরাহী চাপিয়ে দেন।
+Translation Length: 116 characters
+Contains Bengali Unicode: ✓ YES
+
+------------------------------------------------------------

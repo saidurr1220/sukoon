@@ -21,9 +21,10 @@ export function isValidEmail(email: string): boolean {
     return emailRegex.test(email)
 }
 
-// Utility for formatting Surah:Ayah references
+// Utility for formatting Surah:Ayah references with Surah name
 export function formatVerseReference(surah: number, ayah: number): string {
-    return `${surah}:${ayah}`
+    const { formatVerseReference: formatWithName } = require("./surah-names");
+    return formatWithName(surah, ayah, "bn");
 }
 
 // Utility for detecting reduced motion preference

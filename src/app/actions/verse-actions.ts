@@ -1,6 +1,13 @@
 "use server";
 
 import { selectVerseForMood, getFallbackVerse, type VerseWithTranslation } from "@/lib/verse-selection";
+import {
+    getOrCreateSessionId,
+    trackVerseSelection,
+    getRecentlyShownVerses,
+    getUserTimezone,
+} from "@/lib/user-session";
+import { headers } from "next/headers";
 
 /**
  * Server actions for verse selection
@@ -14,14 +21,14 @@ export interface VerseSelectionResult {
 }
 
 /**
- * Server action to select a verse based on user's mood
+ * Server action to select a verse based on user's mood with contextual intelligence
  * @param mood - The mood slug (e.g., "happy", "sad", "anxious")
- * @param recentlyShown - Optional array of recently shown verse IDs
+ * @param timezone - User's timezone (optional, will be detected)
  * @returns Result with verse data or error
  */
 export async function selectVerseByMood(
     mood: string,
-    recentlyShown: string[] = []
+    timezone?: string
 ): Promise<VerseSelectionResult> {
     try {
         // Validate mood input
@@ -33,8 +40,46 @@ export async function selectVerseByMood(
             };
         }
 
-        // Select verse using LLM
-        const verse = await selectVerseForMood(mood.toLowerCase(), recentlyShown);
+        // Parallel execution for faster performance
+        const [sessionId, recentlyShown] = await Promise.all([
+            getOrCreateSessionId(),
+            // Get recently shown in parallel
+            (async () => {
+                const sid = await getOrCreateSessionId();
+                return getRecentlyShownVerses(sid, 10); // Reduced from 20
+            })(),
+        ]);
+
+        // Get user's timezone from session or use provided
+        const userTimezone = timezone || "Asia/Dhaka"; // Default instead of query
+
+        // Get user agent for tracking
+        const headersList = await headers();
+        const userAgent = headersList.get("user-agent") || undefined;
+
+        // Performance tracking
+        const startTime = Date.now();
+        console.log(`[Verse Selection] Starting - Mood: ${mood}, Recently shown: ${recentlyShown.length} verses`);
+
+        // Select verse using contextual intelligence
+        const verse = await selectVerseForMood(
+            mood.toLowerCase(),
+            recentlyShown,
+            sessionId,
+            userTimezone
+        );
+
+        const duration = Date.now() - startTime;
+        console.log(`[Verse Selection] ✅ Selected: ${verse.id} in ${duration}ms`);
+
+        // Track this selection
+        await trackVerseSelection(
+            sessionId,
+            mood.toLowerCase(),
+            verse.id,
+            userTimezone,
+            userAgent
+        );
 
         return {
             success: true,

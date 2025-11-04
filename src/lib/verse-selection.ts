@@ -3,6 +3,7 @@
 import { prisma } from "./prisma";
 import { getLLMClient } from "./llm-client";
 import { loadPrompt } from "./prompts";
+import { selectContextualVerse, getContextualFactors } from "./contextual-ayat-selector";
 
 /**
  * Verse selection utilities for mood-based retrieval
@@ -117,67 +118,123 @@ export async function getVerseById(
 }
 
 /**
- * Select a verse using LLM based on mood
+ * Select a verse using LLM based on mood with contextual intelligence
  * @param moodSlug - The mood slug
  * @param recentlyShown - Array of recently shown verse IDs to avoid
+ * @param userId - Optional user session ID for personalization
+ * @param timezone - User's timezone (default: Asia/Dhaka)
  * @returns Selected verse with full data from database
  */
 export async function selectVerseForMood(
     moodSlug: string,
-    recentlyShown: string[] = []
+    recentlyShown: string[] = [],
+    userId?: string,
+    timezone: string = "Asia/Dhaka"
 ): Promise<VerseWithTranslation> {
     try {
-        // Get candidate verses from database (only IDs and weights)
+        // Get contextually intelligent verse candidates
+        const contextualCandidateIds = await selectContextualVerse(
+            moodSlug,
+            userId,
+            timezone,
+            recentlyShown
+        );
+
+        if (contextualCandidateIds.length === 0) {
+            throw new Error(`No contextual candidates available for mood: ${moodSlug}`);
+        }
+
+        // Get full candidate data with weights
         const candidates = await getMoodCandidates(moodSlug);
 
-        if (candidates.length === 0) {
-            throw new Error(`No candidates available for mood: ${moodSlug}`);
-        }
+        // Filter to only contextually relevant candidates
+        const contextualCandidates = candidates.filter((c) =>
+            contextualCandidateIds.includes(c.verse_id)
+        );
+
+        // If contextual filtering removed too many, use top candidates
+        const candidatesToUse = contextualCandidates.length >= 5
+            ? contextualCandidates
+            : candidates.slice(0, 20); // Use top 20 if contextual filtering too strict
+
+        console.log(`[Selection] Using ${candidatesToUse.length} candidates (${contextualCandidates.length} contextual, ${candidates.length} total)`);
+
+        // Get contextual factors for LLM prompt enhancement
+        const context = await getContextualFactors(moodSlug, userId, timezone);
 
         // Prepare input for LLM (only verse IDs, no Qur'an text)
         const llmInput = {
             requested_moods: [moodSlug],
             k: 1,
-            candidates: candidates.map((c) => ({
+            candidates: candidatesToUse.map((c) => ({
                 verse_id: c.verse_id,
                 moods: [moodSlug],
                 weight: c.weight,
             })),
             recently_shown: recentlyShown,
+            context: {
+                time_of_day: context.timeOfDay,
+                is_jummah: context.isJummah,
+                is_ramadan: context.isRamadan,
+            },
         };
 
         let selectedVerseId: string;
 
-        try {
-            // Call LLM with verse IDs only
-            const llmClient = getLLMClient();
-            const pickerPrompt = await loadPrompt("picker");
-            const response = await llmClient.selectVerseForMood(pickerPrompt, llmInput);
+        // Skip LLM for now (quota issue) - use optimized weighted random
+        // TODO: Re-enable when API quota is available
+        const useLLM = false; // Set to true when quota available
 
-            if (!response.picked || response.picked.length === 0) {
-                throw new Error("LLM returned no selections");
+        if (useLLM) {
+            try {
+                // Call LLM with verse IDs only
+                const llmClient = getLLMClient();
+                const pickerPrompt = await loadPrompt("picker");
+                const response = await llmClient.selectVerseForMood(pickerPrompt, llmInput);
+
+                if (!response.picked || response.picked.length === 0) {
+                    throw new Error("LLM returned no selections");
+                }
+
+                selectedVerseId = response.picked[0].verse_id;
+
+                // Validate that selected verse is in candidates
+                if (!candidatesToUse.some((c) => c.verse_id === selectedVerseId)) {
+                    throw new Error(`LLM selected invalid verse ID: ${selectedVerseId}`);
+                }
+            } catch (llmError) {
+                console.log("LLM selection failed, using weighted random fallback");
+                // Fall through to weighted random below
             }
+        }
 
-            selectedVerseId = response.picked[0].verse_id;
+        if (!useLLM || !selectedVerseId) {
+            // Optimized weighted random selection
 
-            // Validate that selected verse is in candidates
-            if (!candidates.some((c) => c.verse_id === selectedVerseId)) {
-                throw new Error(`LLM selected invalid verse ID: ${selectedVerseId}`);
-            }
-        } catch (llmError) {
-            // Fallback: select highest weighted verse not in recently shown
-            console.error("LLM selection failed, using fallback:", llmError);
-
-            const availableCandidates = candidates.filter(
+            const availableCandidates = candidatesToUse.filter(
                 (c) => !recentlyShown.includes(c.verse_id)
             );
 
-            if (availableCandidates.length === 0) {
-                // If all were recently shown, just use the highest weighted
-                selectedVerseId = candidates[0].verse_id;
-            } else {
-                selectedVerseId = availableCandidates[0].verse_id;
+            const finalCandidates = availableCandidates.length > 0
+                ? availableCandidates
+                : candidatesToUse;
+
+            // Weighted random selection with better distribution
+            const totalWeight = finalCandidates.reduce((sum, c) => sum + c.weight, 0);
+            let random = Math.random() * totalWeight;
+
+            selectedVerseId = finalCandidates[0].verse_id; // Default
+
+            for (const candidate of finalCandidates) {
+                random -= candidate.weight;
+                if (random <= 0) {
+                    selectedVerseId = candidate.verse_id;
+                    break;
+                }
             }
+
+            console.log(`[Fallback] Selected ${selectedVerseId} from ${finalCandidates.length} candidates (total weight: ${totalWeight.toFixed(2)})`);
+            console.log(`[Fallback] Top 3:`, finalCandidates.slice(0, 3).map(c => `${c.verse_id}(${c.weight.toFixed(2)})`).join(', '));
         }
 
         // Retrieve complete verse data from database
