@@ -179,7 +179,7 @@ export async function selectVerseForMood(
             },
         };
 
-        let selectedVerseId: string;
+        let selectedVerseId: string | undefined;
 
         // Skip LLM for now (quota issue) - use optimized weighted random
         // TODO: Re-enable when API quota is available
