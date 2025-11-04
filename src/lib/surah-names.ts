@@ -119,6 +119,16 @@ export const SURAH_NAMES: Record<number, { bn: string; en: string; transliterati
     114: { bn: "আন-নাস", en: "An-Nas", transliteration: "Mankind" },
 };
 
+// Convert English numbers to Bengali
+export function toBengaliNumber(num: number): string {
+    const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+    return num
+        .toString()
+        .split("")
+        .map((digit) => bengaliDigits[parseInt(digit)])
+        .join("");
+}
+
 export function getSurahName(surahNumber: number, language: "bn" | "en" = "bn"): string {
     const surah = SURAH_NAMES[surahNumber];
     return surah ? surah[language] : `Surah ${surahNumber}`;
@@ -127,7 +137,7 @@ export function getSurahName(surahNumber: number, language: "bn" | "en" = "bn"):
 export function formatVerseReference(surah: number, ayah: number, language: "bn" | "en" = "bn"): string {
     const surahName = getSurahName(surah, language);
     if (language === "bn") {
-        return `সূরা ${surahName}, আয়াত ${ayah}`;
+        return `সূরা ${surahName} (${toBengaliNumber(surah)}), আয়াত ${toBengaliNumber(ayah)}`;
     }
-    return `Surah ${surahName}, Ayah ${ayah}`;
+    return `Surah ${surahName} (${surah}), Ayah ${ayah}`;
 }
