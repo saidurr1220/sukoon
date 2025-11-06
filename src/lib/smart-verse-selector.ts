@@ -19,7 +19,7 @@ interface SmartVerseSelection {
     translation: string;
     translatorName: string;
     audioUrl: string | null;
-    timeContext: string;
+    timeContext: "morning" | "afternoon" | "evening" | "night" | "prayer";
     priority: number;
 }
 
