@@ -4,6 +4,7 @@ import { prisma } from "./prisma";
 import { getLLMClient } from "./llm-client";
 import { loadPrompt } from "./prompts";
 import { selectContextualVerse, getContextualFactors } from "./contextual-ayat-selector";
+import { getSmartVerseSelections } from "./smart-verse-selector";
 
 /**
  * Verse selection utilities for mood-based retrieval
