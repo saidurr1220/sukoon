@@ -35,11 +35,15 @@ export interface LLMConfig {
 export class LLMClient {
     private config: LLMConfig;
     private systemPrompt: string | null = null;
+    private useGemini: boolean;
 
     constructor(config: LLMConfig = {}) {
+        // Prefer Gemini if available, fallback to OpenAI
+        this.useGemini = !!process.env.GEMINI_API_KEY;
+
         this.config = {
-            apiKey: config.apiKey || process.env.OPENAI_API_KEY,
-            model: config.model || "gpt-4o-mini",
+            apiKey: config.apiKey || (this.useGemini ? process.env.GEMINI_API_KEY : process.env.OPENAI_API_KEY),
+            model: config.model || (this.useGemini ? "gemini-1.5-flash" : "gpt-4o-mini"),
             maxTokens: config.maxTokens || 500,
             temperature: config.temperature || 0.7,
         };
@@ -121,10 +125,73 @@ export class LLMClient {
     ): Promise<unknown> {
         if (!this.config.apiKey) {
             throw new Error(
-                "LLM API key not configured. Set OPENAI_API_KEY environment variable."
+                "LLM API key not configured. Set GEMINI_API_KEY or OPENAI_API_KEY environment variable."
             );
         }
 
+        if (this.useGemini) {
+            return this.callGemini(userPrompt, inputData);
+        } else {
+            return this.callOpenAI(userPrompt, inputData);
+        }
+    }
+
+    /**
+     * Call Gemini API
+     */
+    private async callGemini(
+        userPrompt: string,
+        inputData: string
+    ): Promise<unknown> {
+        const prompt = `${this.systemPrompt}\n\n${userPrompt}\n\nInput:\n${inputData}\n\nRespond with valid JSON only.`;
+
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${this.config.model}:generateContent?key=${this.config.apiKey}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: prompt }]
+                    }],
+                    generationConfig: {
+                        temperature: this.config.temperature,
+                        maxOutputTokens: this.config.maxTokens,
+                        responseMimeType: "application/json",
+                    },
+                }),
+            }
+        );
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Gemini API error (${response.status}): ${errorText}`);
+        }
+
+        const data = await response.json();
+
+        if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+            throw new Error("Invalid Gemini API response structure");
+        }
+
+        const content = data.candidates[0].content.parts[0].text;
+
+        try {
+            return JSON.parse(content);
+        } catch (error) {
+            throw new Error(`Failed to parse Gemini response as JSON: ${content}`);
+        }
+    }
+
+    /**
+     * Call OpenAI API
+     */
+    private async callOpenAI(
+        userPrompt: string,
+        inputData: string
+    ): Promise<unknown> {
         const messages = [
             { role: "system", content: this.systemPrompt },
             { role: "user", content: `${userPrompt}\n\nInput:\n${inputData}` },
@@ -147,13 +214,13 @@ export class LLMClient {
 
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`LLM API error (${response.status}): ${errorText}`);
+            throw new Error(`OpenAI API error (${response.status}): ${errorText}`);
         }
 
         const data = await response.json();
 
         if (!data.choices?.[0]?.message?.content) {
-            throw new Error("Invalid LLM API response structure");
+            throw new Error("Invalid OpenAI API response structure");
         }
 
         const content = data.choices[0].message.content;
@@ -161,7 +228,7 @@ export class LLMClient {
         try {
             return JSON.parse(content);
         } catch (error) {
-            throw new Error(`Failed to parse LLM response as JSON: ${content}`);
+            throw new Error(`Failed to parse OpenAI response as JSON: ${content}`);
         }
     }
 }

@@ -181,9 +181,8 @@ export async function selectVerseForMood(
 
         let selectedVerseId: string | undefined;
 
-        // Skip LLM for now (quota issue) - use optimized weighted random
-        // TODO: Re-enable when API quota is available
-        const useLLM = false; // Set to true when quota available
+        // Use LLM if Gemini API key is available
+        const useLLM = !!process.env.GEMINI_API_KEY;
 
         if (useLLM) {
             try {
