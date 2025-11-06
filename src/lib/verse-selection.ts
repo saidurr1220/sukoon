@@ -4,7 +4,7 @@ import { prisma } from "./prisma";
 import { getLLMClient } from "./llm-client";
 import { loadPrompt } from "./prompts";
 import { selectContextualVerse, getContextualFactors } from "./contextual-ayat-selector";
-import { getSmartVerseSelections } from "./smart-verse-selector";
+import { selectIntelligentVerse } from "./intelligent-verse-selector";
 
 /**
  * Verse selection utilities for mood-based retrieval
@@ -133,97 +133,34 @@ export async function selectVerseForMood(
     timezone: string = "Asia/Dhaka"
 ): Promise<VerseWithTranslation> {
     try {
-        // Get contextually intelligent verse candidates
-        const contextualCandidateIds = await selectContextualVerse(
-            moodSlug,
-            userId,
+        // Use intelligent verse selector with comprehensive context awareness
+        const verse = await selectIntelligentVerse(
+            moodSlug as any,
             timezone,
             recentlyShown
         );
 
-        if (contextualCandidateIds.length === 0) {
-            throw new Error(`No contextual candidates available for mood: ${moodSlug}`);
-        }
+        return verse;
+    } catch (error) {
+        console.error("Intelligent selection failed, trying fallback:", error);
 
-        // Get full candidate data with weights
-        const candidates = await getMoodCandidates(moodSlug);
+        // Fallback to basic selection if intelligent fails
+        try {
+            const candidates = await getMoodCandidates(moodSlug);
 
-        // Filter to only contextually relevant candidates
-        const contextualCandidates = candidates.filter((c) =>
-            contextualCandidateIds.includes(c.verse_id)
-        );
-
-        // If contextual filtering removed too many, use top candidates
-        const candidatesToUse = contextualCandidates.length >= 5
-            ? contextualCandidates
-            : candidates.slice(0, 20); // Use top 20 if contextual filtering too strict
-
-        console.log(`[Selection] Using ${candidatesToUse.length} candidates (${contextualCandidates.length} contextual, ${candidates.length} total)`);
-
-        // Get contextual factors for LLM prompt enhancement
-        const context = await getContextualFactors(moodSlug, userId, timezone);
-
-        // Prepare input for LLM (only verse IDs, no Qur'an text)
-        const llmInput = {
-            requested_moods: [moodSlug],
-            k: 1,
-            candidates: candidatesToUse.map((c) => ({
-                verse_id: c.verse_id,
-                moods: [moodSlug],
-                weight: c.weight,
-            })),
-            recently_shown: recentlyShown,
-            context: {
-                time_of_day: context.timeOfDay,
-                is_jummah: context.isJummah,
-                is_ramadan: context.isRamadan,
-            },
-        };
-
-        let selectedVerseId: string | undefined;
-
-        // Use LLM if Gemini API key is available
-        const useLLM = !!process.env.GEMINI_API_KEY;
-
-        if (useLLM) {
-            try {
-                // Call LLM with verse IDs only
-                const llmClient = getLLMClient();
-                const pickerPrompt = await loadPrompt("picker");
-                const response = await llmClient.selectVerseForMood(pickerPrompt, llmInput);
-
-                if (!response.picked || response.picked.length === 0) {
-                    throw new Error("LLM returned no selections");
-                }
-
-                selectedVerseId = response.picked[0].verse_id;
-
-                // Validate that selected verse is in candidates
-                if (!candidatesToUse.some((c) => c.verse_id === selectedVerseId)) {
-                    throw new Error(`LLM selected invalid verse ID: ${selectedVerseId}`);
-                }
-            } catch (llmError) {
-                console.log("LLM selection failed, using weighted random fallback");
-                // Fall through to weighted random below
-            }
-        }
-
-        if (!useLLM || !selectedVerseId) {
-            // Optimized weighted random selection
-
-            const availableCandidates = candidatesToUse.filter(
+            const availableCandidates = candidates.filter(
                 (c) => !recentlyShown.includes(c.verse_id)
             );
 
             const finalCandidates = availableCandidates.length > 0
                 ? availableCandidates
-                : candidatesToUse;
+                : candidates;
 
-            // Weighted random selection with better distribution
+            // Weighted random selection
             const totalWeight = finalCandidates.reduce((sum, c) => sum + c.weight, 0);
             let random = Math.random() * totalWeight;
 
-            selectedVerseId = finalCandidates[0].verse_id; // Default
+            let selectedVerseId = finalCandidates[0].verse_id;
 
             for (const candidate of finalCandidates) {
                 random -= candidate.weight;
@@ -233,22 +170,18 @@ export async function selectVerseForMood(
                 }
             }
 
-            console.log(`[Fallback] Selected ${selectedVerseId} from ${finalCandidates.length} candidates (total weight: ${totalWeight.toFixed(2)})`);
-            console.log(`[Fallback] Top 3:`, finalCandidates.slice(0, 3).map(c => `${c.verse_id}(${c.weight.toFixed(2)})`).join(', '));
+            const verse = await getVerseById(selectedVerseId);
+
+            if (!verse) {
+                throw new Error(`Verse not found: ${selectedVerseId}`);
+            }
+
+            return verse;
+        } catch (fallbackError) {
+            throw new Error(
+                `Verse selection failed: ${error instanceof Error ? error.message : "Unknown error"}`
+            );
         }
-
-        // Retrieve complete verse data from database
-        const verse = await getVerseById(selectedVerseId);
-
-        if (!verse) {
-            throw new Error(`Selected verse not found in database: ${selectedVerseId}`);
-        }
-
-        return verse;
-    } catch (error) {
-        throw new Error(
-            `Verse selection failed: ${error instanceof Error ? error.message : "Unknown error"}`
-        );
     }
 }
 

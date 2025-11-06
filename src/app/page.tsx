@@ -8,8 +8,7 @@ import VerseCard from "@/components/VerseCard";
 import VerseSkeleton from "@/components/VerseSkeleton";
 import Disclaimer from "@/components/Disclaimer";
 import Footer from "@/components/Footer";
-import { selectVerseByMood, getSmartVerseCards } from "./actions/verse-actions";
-import VerseCardStack from "@/components/VerseCardStack";
+import { selectVerseByMood } from "./actions/verse-actions";
 import {
   getAdjacentVerse,
   checkAdjacentVerses,
@@ -18,19 +17,12 @@ import {
 // Lazy load PopupSubscribe for better initial bundle size
 const PopupSubscribe = lazy(() => import("@/components/PopupSubscribe"));
 
-type PageState =
-  | "idle"
-  | "loading"
-  | "cards"
-  | "animating"
-  | "displaying"
-  | "error";
+type PageState = "idle" | "loading" | "animating" | "displaying" | "error";
 
 export default function HomePage() {
   const [pageState, setPageState] = useState<PageState>("idle");
   const [selectedMood, setSelectedMood] = useState<MoodType | null>(null);
   const [verse, setVerse] = useState<any>(null);
-  const [verseCards, setVerseCards] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [showSubscribePopup, setShowSubscribePopup] = useState(false);
   const [hasReadVerse, setHasReadVerse] = useState(false);
@@ -74,39 +66,29 @@ export default function HomePage() {
       // Detect user's timezone
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-      // Fetch smart verse cards
-      const cardsResult = await getSmartVerseCards(mood, timezone);
+      // Fetch verse with enhanced contextual intelligence
+      const result = await selectVerseByMood(mood, timezone);
 
-      if (!cardsResult.success || !cardsResult.verses) {
-        throw new Error(cardsResult.error || "Failed to load verse cards");
+      if (!result.success || !result.verse) {
+        throw new Error(result.error || "Failed to load verse");
       }
 
-      setVerseCards(cardsResult.verses);
-      setPageState("cards");
-    } catch (err) {
-      console.error("Error loading verse cards:", err);
-      setError(
-        err instanceof Error ? err.message : "Failed to load verse cards"
+      setVerse(result.verse);
+
+      // Check navigation availability
+      const navCheck = await checkAdjacentVerses(
+        result.verse.surah,
+        result.verse.ayah
       );
+      setNavigationState(navCheck);
+
+      setPageState("animating");
+    } catch (err) {
+      console.error("Error selecting verse:", err);
+      setError(err instanceof Error ? err.message : "Failed to load verse");
       setPageState("error");
       setSelectedMood(null);
     }
-  };
-
-  const handleCardSelect = async (selectedVerse: any) => {
-    setVerse(selectedVerse);
-    setPageState("animating");
-
-    // Check navigation availability
-    const navCheck = await checkAdjacentVerses(
-      selectedVerse.surah,
-      selectedVerse.ayah
-    );
-    setNavigationState(navCheck);
-
-    setTimeout(() => {
-      setPageState("displaying");
-    }, 300);
   };
 
   const handleVerseNavigation = async (direction: "prev" | "next") => {
@@ -165,7 +147,6 @@ export default function HomePage() {
     setPageState("idle");
     setSelectedMood(null);
     setVerse(null);
-    setVerseCards([]);
     setError(null);
     setShowSubscribePopup(false);
     setHasReadVerse(false);
@@ -217,8 +198,10 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Idle State - Show Jar and Mood Chips */}
-        {pageState === "idle" && (
+        {/* Idle or Loading State - Show Jar and Mood Chips */}
+        {(pageState === "idle" ||
+          pageState === "loading" ||
+          pageState === "animating") && (
           <>
             <div role="img" aria-label="Decorative jar animation">
               <HeroJar
@@ -234,58 +217,31 @@ export default function HomePage() {
               >
                 আজ আপনার মন কেমন?
               </p>
-              <MoodChips onMoodSelect={handleMoodSelect} disabled={false} />
+              <MoodChips
+                onMoodSelect={handleMoodSelect}
+                disabled={pageState !== "idle"}
+              />
             </div>
-          </>
-        )}
 
-        {/* Loading State */}
-        {pageState === "loading" && (
-          <div className="mt-8">
-            <VerseSkeleton />
-            <div
-              className="text-center mt-4"
-              role="status"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              <div className="inline-flex items-center gap-2 text-sukoon-muted">
-                <LoadingSpinner />
-                <span className="text-sm">
-                  আপনার জন্য আয়াত প্রস্তুত করা হচ্ছে...
-                </span>
+            {pageState === "loading" && (
+              <div className="mt-8">
+                <VerseSkeleton />
+                <div
+                  className="text-center mt-4"
+                  role="status"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  <div className="inline-flex items-center gap-2 text-sukoon-muted">
+                    <LoadingSpinner />
+                    <span className="text-sm">
+                      আপনার জন্য আয়াত নির্বাচন করা হচ্ছে...
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Card Selection State */}
-        {pageState === "cards" && selectedMood && (
-          <div className="animate-fadeIn">
-            <VerseCardStack
-              mood={selectedMood}
-              verses={verseCards}
-              onCardSelect={handleCardSelect}
-            />
-            <div className="text-center mt-6">
-              <button
-                onClick={handleReset}
-                className="min-h-[44px] text-sukoon-primary hover:text-sukoon-primary/80 transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sukoon-primary rounded px-4 py-2"
-              >
-                ← মুড পরিবর্তন করুন
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Animating State */}
-        {pageState === "animating" && (
-          <div className="mt-8 text-center">
-            <div className="inline-flex items-center gap-2 text-sukoon-muted">
-              <LoadingSpinner />
-              <span className="text-sm">আয়াত লোড হচ্ছে...</span>
-            </div>
-          </div>
+            )}
+          </>
         )}
 
         {/* Displaying State - Show Verse Card */}
