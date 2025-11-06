@@ -136,39 +136,4 @@ export async function getVerseByIdAction(
     }
 }
 
-/**
- * Server action to get smart verse selections for card stack
- * @param mood - The mood slug
- * @param timezone - User's timezone
- * @returns Array of verses with priority scores
- */
-export async function getSmartVerseCards(
-    mood: string,
-    timezone?: string
-): Promise<{
-    success: boolean;
-    verses?: any[];
-    error?: string;
-}> {
-    try {
-        const { getSmartVerseSelections } = await import("@/lib/smart-verse-selector");
-        const userTimezone = timezone || "Asia/Dhaka";
 
-        const verses = await getSmartVerseSelections(
-            mood as any,
-            userTimezone,
-            25 // Get 25 cards
-        );
-
-        return {
-            success: true,
-            verses,
-        };
-    } catch (error) {
-        console.error("Smart verse cards error:", error);
-        return {
-            success: false,
-            error: error instanceof Error ? error.message : "Failed to get verse cards",
-        };
-    }
-}
