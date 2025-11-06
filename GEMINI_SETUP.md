@@ -27,7 +27,7 @@ Gemini AI provides:
 2. Navigate to **Settings** → **Environment Variables**
 3. Add a new variable:
    - **Name**: `GEMINI_API_KEY`
-   - **Value**: Your Gemini API key (e.g., `AIzaSyCqf-apLTBO6sA9fo4MXoDVPtyQIkVqqzo`)
+   - **Value**: Your Gemini API key (paste the key you copied from Google AI Studio)
    - **Environment**: Select all (Production, Preview, Development)
 4. Click **Save**
 

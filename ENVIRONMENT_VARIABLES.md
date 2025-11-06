@@ -40,7 +40,7 @@ This document describes all environment variables used in the Sukoon application
 - **Type**: API Key
 - **Description**: Resend API key for sending emails
 - **Format**: `re_[alphanumeric_string]`
-- **Example**: `re_hXQLwcZH_NmZk63HBKJhVxWx2ikEnfVve`
+- **Example**: `re_1234567890abcdefghijklmnopqrstuv`
 - **Where to Get**: Resend Dashboard → API Keys → Create API Key
 - **Used By**: Email sending functions in `src/lib/email-templates.ts`
 - **Permissions**: Requires "Sending access" permission

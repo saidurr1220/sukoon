@@ -23,7 +23,7 @@ GitGuardian has detected that the following secrets were exposed in your reposit
 ### 2. Revoke & Create New Resend API Key
 
 1. Go to [Resend Dashboard](https://resend.com/api-keys)
-2. Find the old key: `re_hXQLwcZH_NmZk63HBKJhVxWx2ikEnfVve`
+2. Find and revoke the exposed key
 3. Click **Revoke**
 4. Create a new API key
 5. Update in:
@@ -33,7 +33,7 @@ GitGuardian has detected that the following secrets were exposed in your reposit
 ### 3. Delete & Create New Gemini API Key
 
 1. Go to [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. Find the old key: `AIzaSyCqf-apLTBO6sA9fo4MXoDVPtyQIkVqqzo`
+2. Find and delete the exposed key
 3. Click **Delete**
 4. Create a new API key
 5. Update in:
